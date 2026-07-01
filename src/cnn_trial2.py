@@ -10,7 +10,10 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
 
+
+# make results directory if it doesn't exist, should be relative to script location
 RESULTS_DIR = "../results/trial2"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 EPOCHS = 10
@@ -170,9 +173,45 @@ def plot_feature_maps(model, test_loader, num_maps=16):
     plt.savefig(f"{RESULTS_DIR}/feature_maps.png", dpi=150)
     plt.show()
 
+def plot_confusion_matrix(model, test_loader, class_names=None):
+    model.eval()
+    y_true = []
+    y_pred = []
+
+    with torch.no_grad():
+        for images, labels in test_loader:
+            images = images.to(DEVICE)
+            outputs = model(images)
+            _, predicted = torch.max(outputs, 1)
+            y_true.extend(labels.cpu().tolist())
+            y_pred.extend(predicted.cpu().tolist())
+
+    cm = confusion_matrix(y_true, y_pred)
+
+    if class_names is None:
+        class_names = [str(i) for i in range(cm.shape[0])]
+
+    plt.figure(figsize=(8, 6))
+    plt.imshow(cm, interpolation="nearest", cmap="Blues")
+    plt.title("Confusion Matrix")
+    plt.colorbar()
+    ticks = range(len(class_names))
+    plt.xticks(ticks, class_names)
+    plt.yticks(ticks, class_names)
+    plt.xlabel("Predicted Label")
+    plt.ylabel("True Label")
+
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            plt.text(j, i, cm[i, j], ha="center", va="center", color="black")
+
+    plt.tight_layout()
+    plt.savefig(f"{RESULTS_DIR}/confusion_matrix.png", dpi=150)
+    plt.show()
 # main method
 if __name__ == "__main__":
     model = make_model().to(DEVICE)
     train_loader, test_loader = load_data(batch_size=BATCH_SIZE)
     train_losses, test_losses, test_accuracies = train_model(model, train_loader, test_loader, epochs=EPOCHS, lr=LR)
     plot_results(train_losses, test_losses, test_accuracies, model=model, test_loader=test_loader)
+    plot_confusion_matrix(model, test_loader)

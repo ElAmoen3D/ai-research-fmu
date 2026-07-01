@@ -84,9 +84,13 @@ def train_model(model, train_loader, criterion, optimizer, num_epochs=5):
 if __name__ == "__main__":
     # Create the model
     model = make_model()
+    print("MODEL SUMMARY:")
     print(model)
+    
+    print("********************************************")
+    print("TRAINING MODEL - MNIST DATASET")
+    print("********************************************")
 
-    print("TRAINING MODEL - MNIST DATASET \n ************************************\n")
 
     # Load data
     train_loader, test_loader = load_data(batch_size=64)
@@ -98,5 +102,5 @@ if __name__ == "__main__":
     # Train the model
     train_model(model, train_loader, criterion, optimizer, num_epochs=5)
 
-    
+
 
