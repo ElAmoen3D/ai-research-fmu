@@ -2,13 +2,14 @@
 Repository for scripts and notes for FMU AI Research Group
 
 # Index
-Write where everything is here
+- Code in `./src`   
+- Data in `./src/data`
+- Result charts in `./results`
 
 # Description
 Write readme stuff here
 
 # Execution
-Write instructions Here
 
 ## Authors
 Put authors here
